@@ -182,13 +182,13 @@ def reconstruct(length, table, weight, random_meal):
   for j in range(0, length+1)[::1]:
     cur_val = table[j][weight]
     prev_val = table[j-1][weight]
-    if cur_val > prev_val:
+    if cur_val > prev_val and weight >= 0:
       recon.add(j)
       weight = weight - random_meal.calories[j]
   return recon
 
 
-print("\n\n2result by DP: ")
+print("\n\nresult by DP: ")
 start = time.time()
 dynamic(random_meal, weight, length)
 index = reconstruct(length, table, weight, random_meal)
