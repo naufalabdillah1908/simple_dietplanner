@@ -48,6 +48,10 @@ def process_data(test):
     if isinstance(test.fiber[i], str):
       test.fiber[i] = test.fiber[i].replace("g","")
     test.fiber[i] = float(test.fiber[i])
+
+    if isinstance(test.serving_size[i], str):
+      test.serving_size[i] = test.serving_size[i].replace("g","")
+    test.serving_size[i] = float(test.serving_size[i])
   print("Processing done!")
 
 
@@ -106,37 +110,51 @@ def greedy(random_meal, cal_limit):
   count = 0
   density = 0
   length = len(random_meal.density)
+  weight = cal_limit
+  total = 0
 
   print("Makanan yang anda bisa konsumsi hari ini: ")
   start = time.time()
 
-  for i in random_meal.index:
-    if (totweight <= cal_limit):
-      if (totweight + random_meal.calories[i] <= cal_limit):
-        totweight = totweight + random_meal.calories[i]
-        profit = profit + random_meal.total_fat[i]
-        carb = carb + random_meal.carbohydrate[i]
-        fat = fat + random_meal.total_fat[i]
-        fiber = fiber + random_meal.fiber[i]
-        protein = protein + random_meal.protein[i]
-        density = density +random_meal.density[i] 
-        count = count+1
-        print("-", random_meal.name[i], " - ", random_meal.calories[i], "kcal")
-
+  for i in range(length):
+    curW = int(random_meal.calories[i])
+    curD = int(random_meal.density[i])
+    if weight - curW >= 0:
+      weight -= curW
+      total += curD
+      print("-", random_meal.name[i], " - ", int(random_meal.serving_size[i]), "g"," - ", curW, "kcal")
+      profit = profit + random_meal.total_fat[i]
+      carb = carb + random_meal.carbohydrate[i]
+      fat = fat + random_meal.total_fat[i]
+      fiber = fiber + random_meal.fiber[i]
+      protein = protein + random_meal.protein[i]
+      density = density +random_meal.density[i] 
+      count = count+1
+    else:
+      fraction = weight / curW
+      size = int(random_meal.serving_size[i] * fraction)
+      if size <= 70:
+        continue
+      total += curD * fraction
+      weight = int(weight - (curD * fraction))
+      print("-", random_meal.name[i], " - ", int(random_meal.serving_size[i] * fraction), "g", " - ", int(curW * fraction), "kcal" )
+      profit = profit + int(random_meal.total_fat[i] * fraction)
+      carb = carb + int(random_meal.carbohydrate[i] * fraction)
+      fat = fat + int(random_meal.total_fat[i] * fraction)
+      fiber = fiber + int(random_meal.fiber[i] * fraction)
+      protein = protein + int(random_meal.protein[i] * fraction)
+      density = density + int(random_meal.density[i] * fraction)
+      count = count+1 
   end = time.time()
 
-  print("Note: all food has a weight of 100 g")
-  if totweight <= cal_limit:
-    print("\ntotal calorie: ", totweight, " kcal")
-    print("total fat: ", profit, " g")
-    print("total carb: ", carb, " g")
-    print("total fiber: ", fiber, " g")
-    print("total protein: ", protein, " g")
+  totweight = cal_limit-weight
+  print("\ntotal calorie: ", totweight, " kcal")
+  print("total fat: ", profit, " g")
+  print("total carb: ", carb, " g")
+  print("total fiber: ", fiber, " g")
+  print("total protein: ", protein, " g")
 
-    print("Nutritional Density Value: ", density/count)
-  
-  else:
-    print("tidak ada solusi")
+  print("Nutritional Density Value: ", density/count)
 
   print("Total time taken: ", end-start)
 
@@ -179,6 +197,8 @@ def reconstruct(length, table, weight, random_meal):
     cur_val = table[j][weight]
     prev_val = table[j-1][weight]
     if cur_val > prev_val and weight >= 0:
+      if weight - random_meal.calories[j] < 0:
+        break 
       recon.add(j)
       weight = weight - random_meal.calories[j]
   return recon
