@@ -74,16 +74,12 @@ for i in test.index:
 #insert density ke dataframe
 test.insert(0, "density", density)
 
-#sort by density
-test = test.sort_values(by='density', ascending=True)
-
 #choose random 100 meals, biar bervariasi tiap run
-
 random_meal = pd.DataFrame()
 random_meal = test.sample(n = 100)
 
 #sort randomnya by density
-random_meal = random_meal.sort_values(by="density", ascending = True)
+random_meal = random_meal.sort_values(by="density", ascending = False)
 
 idx = []
 
