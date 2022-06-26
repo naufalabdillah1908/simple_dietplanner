@@ -118,12 +118,9 @@ def greedy(random_meal, cal_limit):
 
   for i in range(length):
     curW = int(random_meal.calories[i])
-    curD = int(random_meal.density[i])
     if weight - curW >= 0:
       weight -= curW
-      total += curD
       print("-", random_meal.name[i], " - ", int(random_meal.serving_size[i]), "g"," - ", curW, "kcal")
-      profit = profit + random_meal.total_fat[i]
       carb = carb + random_meal.carbohydrate[i]
       fat = fat + random_meal.total_fat[i]
       fiber = fiber + random_meal.fiber[i]
@@ -133,12 +130,10 @@ def greedy(random_meal, cal_limit):
     else:
       fraction = weight / curW
       size = int(random_meal.serving_size[i] * fraction)
-      if size <= 70:
+      if size <= 50:
         continue
-      total += curD * fraction
-      weight = int(weight - (curD * fraction))
+      weight = int(weight - (curW * fraction))
       print("-", random_meal.name[i], " - ", int(random_meal.serving_size[i] * fraction), "g", " - ", int(curW * fraction), "kcal" )
-      profit = profit + int(random_meal.total_fat[i] * fraction)
       carb = carb + int(random_meal.carbohydrate[i] * fraction)
       fat = fat + int(random_meal.total_fat[i] * fraction)
       fiber = fiber + int(random_meal.fiber[i] * fraction)
@@ -149,7 +144,7 @@ def greedy(random_meal, cal_limit):
 
   totweight = cal_limit-weight
   print("\ntotal calorie: ", totweight, " kcal")
-  print("total fat: ", profit, " g")
+  print("total fat: ", fat, " g")
   print("total carb: ", carb, " g")
   print("total fiber: ", fiber, " g")
   print("total protein: ", protein, " g")
@@ -168,6 +163,8 @@ greedy(random_meal, cal_limit)
 length = len(random_meal.index)
 table = [[-1 for i in range(cal_limit + 1)] for j in range(length+1)]
 weight = cal_limit
+
+
 #build table
 def dynamic(random_meal, weight, length):
   for i in range(length+1):
@@ -213,7 +210,6 @@ print("makanan yang bisa anda makan hari ini: ")
 for i in index:
   print("-", random_meal.name[i], " - ", random_meal.calories[i], "kcal")
   totweight = totweight + random_meal.calories[i]
-  profit = profit + random_meal.total_fat[i]
   carb = carb + random_meal.carbohydrate[i]
   fat = fat + random_meal.total_fat[i]
   fiber = fiber + random_meal.fiber[i]
@@ -223,7 +219,7 @@ for i in index:
 print("Note: all food has a weight of 100 g")
 
 print("\ntotal calorie: ", totweight, " kcal")
-print("total fat: ", profit, " g")
+print("total fat: ", fat, " g")
 print("total carb: ", carb, " g")
 print("total fiber: ", fiber, " g")
 print("total protein: ", protein, " g")
